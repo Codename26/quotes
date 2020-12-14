@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quotes/bloc/quotes/quotes_bloc.dart';
 import 'package:quotes/ui/widget/categories_list_item.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class CategoriesHorizontalList extends StatefulWidget {
   final List<String> categories;
-  CategoriesHorizontalList({@required this.categories}) : super();
+  final Function(String) categoryPickCallback;
+  CategoriesHorizontalList({@required this.categories, @required this.categoryPickCallback}) : super();
 
   @override
   _CategoriesHorizontalListState createState() => _CategoriesHorizontalListState();
@@ -36,6 +39,8 @@ class _CategoriesHorizontalListState extends State<CategoriesHorizontalList> {
                     setState(() {
                       currentCategorie = index;
                     });
+                    widget.categoryPickCallback(widget.categories[index]);
+                    BlocProvider.of<QuotesBloc>(context).add(QuotesGet(widget.categories[index]));
                   },
                   child: CategoriesListItem(
                     text: widget.categories[index],

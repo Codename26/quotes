@@ -16,34 +16,38 @@ class QuotesBloc extends Bloc<QuotesEvent, QuotesState> {
   Stream<QuotesState> mapEventToState(
     QuotesEvent event,
   ) async* {
-    if (event is QuotesInit) {
-      yield* _mapQuotesInitToState();
-    } else if (event is QuotesGetNext) {
-      yield* _mapQuotesGetNextToState();
+    if (event is QuotesGetNext) {
+      yield* _mapQuotesGetNextToState(event.category);
+    } else if (event is QuotesGet) {
+      yield* _mapQuotesGetToState(event.category);
     }
   }
 
-  Stream<QuotesState> _mapQuotesInitToState() async* {
-    yield QuotesLoading();
-    try {
-      var quotes = await quotesRepository.getQuotes();
-      yield QuotesSuccess(quotes);
-    } catch (e) {
-      yield QuotesError();
-    }
-  }
-
-  Stream<QuotesState> _mapQuotesGetNextToState() async* {
+  Stream<QuotesState> _mapQuotesGetNextToState(String category) async* {
     // yield QuotesLoading();
     final currentState = state;
     if (currentState is QuotesSuccess) {
       try {
-        var quotes = await quotesRepository.getNextQuotes();
+        var quotes = await quotesRepository.getNextQuotes(category);
         var allQuotes = currentState.quotes + quotes;
         yield QuotesSuccess(allQuotes);
       } catch (e) {
         yield QuotesError();
       }
+    }
+  }
+
+  Stream<QuotesState> _mapQuotesGetToState(String categoryName) async* {
+    yield QuotesLoading();
+    try {
+      var quotes = await quotesRepository.getQuotesFromCategory(categoryName);
+      if (quotes.length == 0) {
+        yield QuotesEmpty();
+      } else {
+        yield QuotesSuccess(quotes);
+      }
+    } catch (e) {
+      yield QuotesError();
     }
   }
 }

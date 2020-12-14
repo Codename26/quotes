@@ -8,12 +8,17 @@ class QuotesRepository {
     return quotes;
   }
 
-  Future<List<Quote>> getNextQuotes() async {
+  Future<List<Quote>> getNextQuotes(String category) async {
     try {
-      var quotes = await _firebaseDataProvider.getNextQuotes();
+      var quotes = await _firebaseDataProvider.getNextQuotes(category);
       return quotes;
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<List<Quote>> getQuotesFromCategory(String category) async {
+    var quotes = await _firebaseDataProvider.getQuotesFromCategory(category);
+    return quotes;
   }
 }

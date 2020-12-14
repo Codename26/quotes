@@ -26,6 +26,11 @@ class QuotesSuccess extends QuotesState {
   String toString() => 'QuotesSuccess';
 }
 
+class QuotesEmpty extends QuotesState {
+  @override
+  String toString() => 'QuotesEmpty';
+}
+
 class QuotesError extends QuotesState {
   @override
   String toString() => 'QuotesError';

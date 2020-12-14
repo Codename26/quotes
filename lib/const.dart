@@ -19,4 +19,7 @@ class Constant {
     'Love',
     'Success'
   ];
+
+  static const CATEGORY_ALL = 'all';
+  static const NO_QUOTES_MESSAGE = 'Sorry, no quotes in this category';
 }

@@ -21,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void initState() {
-    BlocProvider.of<QuotesBloc>(context).add(QuotesInit());
+    BlocProvider.of<QuotesBloc>(context).add(QuotesGet(Constant.CATEGORY_ALL));
 
     super.initState();
   }

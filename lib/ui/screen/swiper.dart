@@ -13,31 +13,32 @@ class SwiperScreen extends StatefulWidget {
   _SwiperScreenState createState() => _SwiperScreenState();
 }
 
-class _SwiperScreenState extends State<SwiperScreen> {
+class _SwiperScreenState extends State<SwiperScreen> with SingleTickerProviderStateMixin {
+  String _currentCategory = Constant.CATEGORY_ALL;
+  AnimationController _animationController;
+  ColorTween _colorTween;
+
+  @override
+  void initState() {
+    _animationController = AnimationController(duration: const Duration(seconds: 1), vsync: this);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocListener<QuotesBloc, QuotesState>(listener: (context, state) {
-      print(state);
-    }, child: BlocBuilder<QuotesBloc, QuotesState>(builder: (context, state) {
+    return BlocBuilder<QuotesBloc, QuotesState>(builder: (context, state) {
       if (state is QuotesLoading) {
         return _buildLoader();
       } else if (state is QuotesSuccess) {
         return _buildSwiperBody(state);
+      } else if (state is QuotesEmpty) {
+        return _buildEmptyPage();
       } else
         return Container();
-    }));
+    });
   }
 
   Widget _buildLoader() {
-    return Center(
-      child: CircularProgressIndicator(
-        strokeWidth: 1.5,
-      ),
-    );
-  }
-
-  Widget _buildSwiperBody(QuotesSuccess state) {
-    print("quotes length is ${state.quotes.length}");
     return Container(
       color: ThemeProvider.BACKGROUND_MAIN_COLOR,
       child: Column(
@@ -49,6 +50,37 @@ class _SwiperScreenState extends State<SwiperScreen> {
                 child: Container(
                   child: CategoriesHorizontalList(
                     categories: Constant.QUOTES_CATEGORIES,
+                    categoryPickCallback: _setCurrentCategory,
+                  ),
+                ),
+              )),
+          Expanded(
+            flex: 12,
+            child: Padding(
+                padding: const EdgeInsets.only(top: 18.0),
+                child: Center(
+                    child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ))),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSwiperBody(QuotesSuccess state) {
+    return Container(
+      color: ThemeProvider.BACKGROUND_MAIN_COLOR,
+      child: Column(
+        children: [
+          Expanded(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: Container(
+                  child: CategoriesHorizontalList(
+                    categories: Constant.QUOTES_CATEGORIES,
+                    categoryPickCallback: _setCurrentCategory,
                   ),
                 ),
               )),
@@ -66,8 +98,8 @@ class _SwiperScreenState extends State<SwiperScreen> {
                 layout: SwiperLayout.DEFAULT,
                 onIndexChanged: (index) {
                   print(index);
-                  if (index == 2) {
-                    BlocProvider.of<QuotesBloc>(context).add(QuotesGetNext());
+                  if (state.quotes.length - index <= 2) {
+                    BlocProvider.of<QuotesBloc>(context).add(QuotesGetNext(_currentCategory));
                   }
                 },
                 loop: false,
@@ -79,5 +111,42 @@ class _SwiperScreenState extends State<SwiperScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildEmptyPage() {
+    return Container(
+      color: ThemeProvider.BACKGROUND_MAIN_COLOR,
+      child: Column(
+        children: [
+          Expanded(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: Container(
+                  child: CategoriesHorizontalList(
+                    categories: Constant.QUOTES_CATEGORIES,
+                    categoryPickCallback: _setCurrentCategory,
+                  ),
+                ),
+              )),
+          Expanded(
+            flex: 12,
+            child: Padding(
+                padding: const EdgeInsets.only(top: 18.0),
+                child: Center(
+                    child: Text(
+                  Constant.NO_QUOTES_MESSAGE,
+                  style: ThemeProvider.CATEGORIES_LIST_ITEM_ACTIVE,
+                ))),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _setCurrentCategory(String category) {
+    setState(() {
+      _currentCategory = category;
+    });
   }
 }
