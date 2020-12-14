@@ -16,11 +16,14 @@ class SwiperScreen extends StatefulWidget {
 class _SwiperScreenState extends State<SwiperScreen> with SingleTickerProviderStateMixin {
   String _currentCategory = Constant.CATEGORY_ALL;
   AnimationController _animationController;
-  ColorTween _colorTween;
+  Animation<Color> _colorTween;
 
   @override
   void initState() {
     _animationController = AnimationController(duration: const Duration(seconds: 1), vsync: this);
+    _colorTween = _animationController.drive(
+        ColorTween(begin: ThemeProvider.LIKE_BUTTON_START_GRADIENT, end: ThemeProvider.LIKE_BUTTON_FINISH_GRADIENT));
+    _animationController.repeat();
     super.initState();
   }
 
@@ -61,6 +64,7 @@ class _SwiperScreenState extends State<SwiperScreen> with SingleTickerProviderSt
                 child: Center(
                     child: CircularProgressIndicator(
                   strokeWidth: 2,
+                  valueColor: _colorTween,
                 ))),
           ),
         ],
