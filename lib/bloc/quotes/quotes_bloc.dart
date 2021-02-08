@@ -28,7 +28,8 @@ class QuotesBloc extends Bloc<QuotesEvent, QuotesState> {
     final currentState = state;
     if (currentState is QuotesSuccess) {
       try {
-        var quotes = await quotesRepository.getNextQuotes(category);
+        var quotes = await quotesRepository.getQuotes(category);
+        print("Quotes from Firebase received");
         var allQuotes = currentState.quotes + quotes;
         yield QuotesSuccess(allQuotes);
       } catch (e) {
@@ -40,7 +41,8 @@ class QuotesBloc extends Bloc<QuotesEvent, QuotesState> {
   Stream<QuotesState> _mapQuotesGetToState(String categoryName) async* {
     yield QuotesLoading();
     try {
-      var quotes = await quotesRepository.getQuotesFromCategory(categoryName);
+      var quotes = await quotesRepository.getQuotes(categoryName);
+      print("Quotes from Firebase received");
       if (quotes.length == 0) {
         yield QuotesEmpty();
       } else {

@@ -14,7 +14,7 @@ class FirebaseDataProvider {
     var myQuery = quotesRef.limit(4);
     var res = await myQuery.get();
     res.docs.forEach((element) {
-      quotes.add(Quote.fromDataSnapshot(element.data()));
+      quotes.add(Quote.fromDataSnapshot(element));
     });
     _lastDocument = res.docs[res.docs.length - 1];
     return quotes;
@@ -27,7 +27,7 @@ class FirebaseDataProvider {
         quotesRef.where("categories", arrayContains: category.toLowerCase()).limit(4).startAfterDocument(_lastDocument);
     var res = await myQuery.get();
     res.docs.forEach((element) {
-      quotes.add(Quote.fromDataSnapshot(element.data()));
+      quotes.add(Quote.fromDataSnapshot(element));
     });
     if (res.docs.length > 0) {
       _lastDocument = res.docs[res.docs.length - 1];
@@ -43,7 +43,7 @@ class FirebaseDataProvider {
     var res = await myQuery.get();
     if (res.docs.isNotEmpty) {
       res.docs.forEach((element) {
-        quotes.add(Quote.fromDataSnapshot(element.data()));
+        quotes.add(Quote.fromMap(element.data(), category));
       });
       _lastDocument = res.docs[res.docs.length - 1];
       return quotes;

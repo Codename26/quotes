@@ -1,10 +1,22 @@
 import 'package:quotes/data/data_provider/firebase_data_provider.dart';
+import 'package:quotes/data/data_provider/local_data_provider.dart';
 import 'package:quotes/data/model/quote.dart';
 
 class QuotesRepository {
   FirebaseDataProvider _firebaseDataProvider = FirebaseDataProvider();
-  Future<List<Quote>> getQuotes() async {
-    var quotes = await _firebaseDataProvider.getQuotes();
+  LocalDataProvider _localDataProvider = LocalDataProvider();
+  Future<List<Quote>> getQuotes(String category) async {
+    List<Quote> quotes;
+    if (category == null) {
+      quotes = await _localDataProvider.getAllQuotes();
+    } else {
+      quotes = await _localDataProvider.getQuotes(category);
+    }
+
+    if (quotes.isEmpty) {
+      quotes = await _firebaseDataProvider.getQuotes();
+      _localDataProvider.saveQuotes(quotes);
+    }
     return quotes;
   }
 
